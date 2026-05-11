@@ -55,7 +55,7 @@ if st.session_state.user is None:
     st.markdown("</div>", unsafe_allow_html=True)
     
     with st.container(border=True):
-        role_select = st.radio("Đăng nhập với vai trò:", ["Nhân viên", "Quản lý (Admin)", "Khách hàng"], horizontal=True)
+        role_select = st.radio("Đăng nhập với vai trò:", ["Nhân viên", "Giám sát", "Khách hàng"], horizontal=True)
         
         if role_select == "Nhân viên":
             uid = st.text_input("Nhập mã nhân viên:").strip()
