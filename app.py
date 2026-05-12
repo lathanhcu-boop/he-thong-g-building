@@ -213,20 +213,21 @@ else:
             area_selected = st.selectbox("Xem khu vực:", list(job_list.keys()))
             jobs_to_show = job_list[area_selected]
         else:
-            # Lấy khu vực được phân công (có thể bao gồm cả việc phát sinh)
+            # Lấy khu vực được phân công
             area_selected = my_assign.iloc[-1]['Khu vực']
+
             st.success(f"📍 Khu vực trực: **{area_selected}**")
-            
-           # Tách tên khu vực gốc
-                area_base = area_selected.split(" (")[0]
+
+            # Tách khu vực gốc
+            area_base = area_selected.split(" (")[0]
 
             # Nếu là công việc phát sinh
-             if "PHÁT SINH:" in area_selected:
+            if "PHÁT SINH:" in area_selected:
                 jobs_to_show = [
                     area_selected.split("PHÁT SINH: ")[1].replace(")", "")
                 ]
-        else:
-            # Lấy checklist chuẩn theo khu vực gốc
+            else:
+                # Hiển thị checklist chuẩn
                 jobs_to_show = job_list.get(area_base, [])
             
         st.divider()
