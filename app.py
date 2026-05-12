@@ -4,7 +4,7 @@ import os
 from datetime import datetime, date
 
 # --- 1. CẤU HÌNH ---
-st.set_page_config(page_title="G-Building Management System", layout="wide")
+st.set_page_config(page_title="QUẢN LÝ NHÂN SỰ", layout="wide")
 
 URL_NV = "https://docs.google.com/spreadsheets/d/1XoiaAab4uTuHiGw5Q54JF362P--QjQsA/export?format=csv&gid=1095724926"
 URL_CV = "https://docs.google.com/spreadsheets/d/1YpMjVzZLsfX9Eedu3rrlDlKiVCHQcNidJK69Pw1wxUo/export?format=csv&gid=2113008419"
@@ -51,7 +51,7 @@ if 'role' not in st.session_state: st.session_state.role = None
 if st.session_state.user is None:
     st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
     st.image("https://i.ibb.co/mC56FtDD/logo-g-building.png", width=120)
-    st.markdown("## HỆ THỐNG QUẢN LÝ VỆ SINH")
+    st.markdown("## HỆ THỐNG QUẢN LÝ CHẤT LƯỢNG")
     st.markdown("</div>", unsafe_allow_html=True)
     
     with st.container(border=True):
@@ -77,7 +77,7 @@ if st.session_state.user is None:
         else:
             email = st.text_input("Email Quản lý:").strip().lower()
             if st.button("Đăng nhập Admin", use_container_width=True):
-                st.session_state.user = "Admin G-Building"; st.session_state.role = "admin"; st.rerun()
+                st.session_state.user = "Admin"; st.session_state.role = "admin"; st.rerun()
 
 # --- 4. GIAO DIỆN CHÍNH ---
 else:
