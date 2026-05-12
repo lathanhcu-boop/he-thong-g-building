@@ -50,8 +50,7 @@ if 'role' not in st.session_state: st.session_state.role = None
 # --- 3. GIAO DIỆN ĐĂNG NHẬP ---
 if st.session_state.user is None:
     st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    st.image("https://i.ibb.co/mC56FtDD/logo-g-building.png", width=120)
-    st.markdown("## HỆ THỐNG QUẢN LÝ CHẤT LƯỢNG")
+    st.markdown("#### HỆ THỐNG QUẢN LÝ CHẤT LƯỢNG")
     st.markdown("</div>", unsafe_allow_html=True)
     
     with st.container(border=True):
