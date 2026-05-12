@@ -217,14 +217,18 @@ else:
             area_selected = my_assign.iloc[-1]['Khu vực']
             st.success(f"📍 Khu vực trực: **{area_selected}**")
             
-            # Nếu là khu vực chuẩn thì lấy list jobs, nếu có chữ 'PHÁT SINH' thì chỉ hiện job đó
-            if "PHÁT SINH:" in area_selected:
-                jobs_to_show = [area_selected.split("PHÁT SINH: ")[1].replace(")", "")]
+           # Tách tên khu vực gốc
                 area_base = area_selected.split(" (")[0]
-            else:
-                jobs_to_show = job_list.get(area_selected, [])
-                area_base = area_selected
 
+            # Nếu là công việc phát sinh
+             if "PHÁT SINH:" in area_selected:
+                jobs_to_show = [
+                    area_selected.split("PHÁT SINH: ")[1].replace(")", "")
+                ]
+        else:
+            # Lấy checklist chuẩn theo khu vực gốc
+                jobs_to_show = job_list.get(area_base, [])
+            
         st.divider()
         for i, job in enumerate(jobs_to_show):
             with st.container(border=True):
