@@ -108,7 +108,6 @@ else:
         with t_history:
             st.subheader("Lịch sử vận hành & Nghiệm thu")
             df_hist = st.session_state.history.copy()
-            # Khách hàng xem lịch sử của khu vực liên quan hoặc tất cả (tùy cấu hình, ở đây cho xem tất cả lịch sử đã xong)
             df_cus_view = df_hist[df_hist['Trạng thái'] == "Hoàn thành"].sort_values(by="Ngày", ascending=False)
             st.dataframe(df_cus_view, use_container_width=True, hide_index=True)
 
@@ -136,7 +135,6 @@ else:
             col_a, col_b = st.columns([1, 1.2])
             with col_a:
                 st.subheader("🆕 Giao việc")
-                # Thêm lựa chọn lấy việc từ danh sách phát sinh
                 source = st.radio("Nguồn công việc:", ["Từ danh mục chuẩn", "Từ yêu cầu Khách hàng"], horizontal=True)
                 
                 with st.form("assign_form"):
@@ -159,11 +157,9 @@ else:
                     
                     if st.form_submit_button("Xác nhận phân công"):
                         if sel_nvs and sel_kv:
-                            # Lưu vào phân công chính
                             new_assign = pd.DataFrame({"Ngày": [w_date.strftime("%Y-%m-%d")] * len(sel_nvs), "Nhân viên": sel_nvs, "Khu vực": [f"{sel_kv} ({sel_job_name})"] * len(sel_nvs)})
                             new_assign.to_csv(ASSIGN_HISTORY_FILE, mode='a', header=False, index=False, encoding='utf-8-sig')
                             
-                            # Nếu là việc phát sinh, cập nhật trạng thái trong file Issue
                             if source == "Từ yêu cầu Khách hàng":
                                 df_issues = pd.read_csv(ISSUE_FILE)
                                 df_issues.loc[selected_issue_idx, 'Trạng thái'] = "Đã phân công"
@@ -212,24 +208,19 @@ else:
             area_selected = st.selectbox("Xem khu vực:", list(job_list.keys()))
             jobs_to_show = job_list[area_selected]
         else:
-            # Lấy khu vực được phân công
             area_selected = my_assign.iloc[-1]['Khu vực']
-
             st.success(f"📍 Khu vực trực: **{area_selected}**")
-
-            # Tách khu vực gốc
             area_base = area_selected.split(" (")[0]
 
-            # Nếu là công việc phát sinh
             if "PHÁT SINH:" in area_selected:
                 jobs_to_show = [
                     area_selected.split("PHÁT SINH: ")[1].replace(")", "")
                 ]
             else:
-                # Hiển thị checklist chuẩn
                 jobs_to_show = job_list.get(area_base, [])
             
         st.divider()
+        st.subheader("📝 Danh sách Checklist Công việc")
         for i, job in enumerate(jobs_to_show):
             with st.container(border=True):
                 c1, c2, c3 = st.columns([2, 1.5, 1])
@@ -256,3 +247,47 @@ else:
                         st.session_state.history = pd.concat([st.session_state.history, pd.DataFrame([new_row])], ignore_index=True)
                         st.session_state.history.to_csv(DATA_FILE, index=False, encoding='utf-8-sig')
                         st.rerun()
+
+        # ==================== PHẦN THÊM MỚI: DÒNG THỜI GIAN NHÂN VIÊN ====================
+        st.divider()
+        st.subheader("🕒 Dòng Thời Gian Hoạt Động Hôm Nay")
+        
+        # Lọc dữ liệu lịch sử làm việc của riêng nhân viên này trong hôm nay
+        df_my_hist = st.session_state.history[
+            (st.session_state.history['Nhân viên'] == st.session_state.user) & 
+            (st.session_state.history['Ngày'] == today_str)
+        ].copy()
+        
+        if not df_my_hist.empty:
+            # Sắp xếp theo cột thời gian 'Bắt đầu' từ mới nhất đến cũ nhất
+            df_my_hist = df_my_hist.sort_values(by='Bắt đầu', ascending=False).reset_index(drop=True)
+            
+            for index, row in df_my_hist.iterrows():
+                # Xác định nhãn trạng thái và màu sắc thanh viền bên trái thẻ
+                if row['Trạng thái'] == "Đang làm":
+                    status_text = "⏳ Đang làm"
+                    border_color = "#3498db" # Xanh dương cho việc đang làm
+                else:
+                    status_text = "✅ Đã xong"
+                    border_color = "#2ecc71" # Xanh lá cho việc đã xong
+                
+                # Điều kiện bôi màu vàng cho hành động GẦN NHẤT (dòng đầu tiên có index == 0)
+                if index == 0:
+                    bg_color = "#FFF2CC" # Màu vàng kem nhạt dịu mắt
+                    label_recent = "<span style='color: #D4AC0D; font-weight: bold;'>⭐ GẦN NHẤT</span><br>"
+                    border_color = "#FFC000" # Đổi viền sang vàng đậm nổi bật
+                else:
+                    bg_color = "#F8F9F9" # Màu xám trắng lịch sự cho các việc cũ hơn
+                    label_recent = ""
+                
+                # Tạo giao diện dạng Card (Thẻ bài) hiển thị đẹp mắt trên điện thoại
+                st.markdown(f"""
+                <div style="background-color: {bg_color}; padding: 15px; border-left: 6px solid {border_color}; border-radius: 8px; margin-bottom: 12px; box-shadow: 1px 1px 5px rgba(0,0,0,0.05);">
+                    {label_recent}
+                    <strong style="font-size: 15px; color: #2C3E50;">📍 Khu vực: {row['Khu vực']}</strong><br>
+                    <span style="color: #34495E;">🛠️ <b>Công việc:</b> {row['Công việc']}</span><br>
+                    <small style="color: #7F8C8D;">🕒 Bắt đầu: {row['Bắt đầu']} | Hoàn thành: {row['Hoàn thành']} | Trạng thái: <b>{status_text}</b></small>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Bạn chưa bắt đầu thao tác công việc nào trong hôm nay.")
