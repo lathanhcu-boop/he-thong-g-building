@@ -3,6 +3,9 @@ import pandas as pd
 import os
 from datetime import datetime, date, timedelta, timezone
 
+# Khởi tạo Múi giờ Việt Nam (UTC+7)
+VN_TZ = timezone(timedelta(hours=7))
+
 # --- 1. CẤU HÌNH ---
 st.set_page_config(page_title="QUẢN LÝ NHÂN SỰ", layout="wide")
 
